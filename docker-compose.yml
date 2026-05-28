@@ -35,6 +35,7 @@ services:
     environment:
       NASA_API_KEY: ${NASA_API_KEY:-DEMO_KEY}
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      SSL_VERIFY: ${SSL_VERIFY:-false}
     depends_on:
       rabbitmq:
         condition: service_healthy

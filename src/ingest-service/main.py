@@ -9,6 +9,10 @@ import httpx
 import pika
 from fastapi import FastAPI, HTTPException, Query
 
+# SSL_VERIFY can be set to "false" in environments with SSL inspection proxies
+# (e.g., corporate/university networks that intercept HTTPS traffic)
+SSL_VERIFY = os.getenv("SSL_VERIFY", "true").lower() != "false"
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -24,7 +28,8 @@ async def fetch_nasa_gst(start_date: str, end_date: str, max_retries: int = 3) -
     params = {"startDate": start_date, "endDate": end_date, "api_key": NASA_API_KEY}
     for attempt in range(max_retries):
         try:
-            async with httpx.AsyncClient(timeout=30.0, verify=certifi.where()) as client:
+            ssl_ctx = certifi.where() if SSL_VERIFY else False
+            async with httpx.AsyncClient(timeout=30.0, verify=ssl_ctx) as client:
                 response = await client.get(NASA_GST_URL, params=params)
                 response.raise_for_status()
                 logger.info(f"NASA DONKI fetched successfully on attempt {attempt + 1}")
