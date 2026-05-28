@@ -1,6 +1,6 @@
 import logging
 import threading
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Callable, List, Optional
 
 logger = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ def process_event(event: dict, on_new_alert: Optional[Callable] = None) -> Optio
             "start_time": event.get("start_time", ""),
             "kp_index": event.get("kp_index", 0),
             **classification,
-            "processed_at": datetime.utcnow().isoformat(),
+            "processed_at": datetime.now(timezone.utc).isoformat(),
         }
         _alerts.append(alert)
         logger.info(
