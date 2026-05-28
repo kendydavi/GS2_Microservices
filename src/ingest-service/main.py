@@ -4,6 +4,7 @@ import logging
 import os
 from datetime import datetime, timedelta
 
+import certifi
 import httpx
 import pika
 from fastapi import FastAPI, HTTPException, Query
@@ -23,7 +24,7 @@ async def fetch_nasa_gst(start_date: str, end_date: str, max_retries: int = 3) -
     params = {"startDate": start_date, "endDate": end_date, "api_key": NASA_API_KEY}
     for attempt in range(max_retries):
         try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
+            async with httpx.AsyncClient(timeout=30.0, verify=certifi.where()) as client:
                 response = await client.get(NASA_GST_URL, params=params)
                 response.raise_for_status()
                 logger.info(f"NASA DONKI fetched successfully on attempt {attempt + 1}")
