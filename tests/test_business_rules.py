@@ -6,8 +6,7 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../src/alert-service"))
 
-# Import the pure functions — no network, no Redis, no RabbitMQ needed
-from main import classify_severity, process_event, _processed_ids, _alerts
+from business_rules import classify_severity, process_event, _processed_ids, _alerts
 
 
 def setup_function():
@@ -41,12 +40,8 @@ def test_rn1_severe_with_emergency():
 
 # --- RN3 Tests ---
 
-def test_rn3_duplicate_event_discarded(monkeypatch):
+def test_rn3_duplicate_event_discarded():
     """Second event with the same event_id must be discarded and logged."""
-    # Patch redis to avoid real connection
-    import main as alert_main
-    monkeypatch.setattr(alert_main.redis_client, "delete", lambda *a, **kw: None)
-
     event = {"event_id": "GST-2024-001", "event_type": "GST", "start_time": "2024-01-01", "kp_index": 6}
 
     first = process_event(event)
